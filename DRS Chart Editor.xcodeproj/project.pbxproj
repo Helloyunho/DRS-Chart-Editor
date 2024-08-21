@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		55261B0C2C75A04100FF6F35 /* DRSKit in Frameworks */ = {isa = PBXBuildFile; productRef = 55261B0B2C75A04100FF6F35 /* DRSKit */; };
+		55261B322C75EC5E00FF6F35 /* Kroma in Frameworks */ = {isa = PBXBuildFile; productRef = 55261B312C75EC5E00FF6F35 /* Kroma */; };
+		55261B382C761DF900FF6F35 /* DRSKit in Frameworks */ = {isa = PBXBuildFile; productRef = 55261B372C761DF900FF6F35 /* DRSKit */; };
+		55261B3A2C761DF900FF6F35 /* DRSXMLImporter in Frameworks */ = {isa = PBXBuildFile; productRef = 55261B392C761DF900FF6F35 /* DRSXMLImporter */; };
+		55261B582C763E4300FF6F35 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 55261B572C763E4300FF6F35 /* SwiftUIIntrospect */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		55261AE22C759C5000FF6F35 /* DRS Chart Editor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DRS Chart Editor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +31,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55261B0C2C75A04100FF6F35 /* DRSKit in Frameworks */,
+				55261B382C761DF900FF6F35 /* DRSKit in Frameworks */,
+				55261B3A2C761DF900FF6F35 /* DRSXMLImporter in Frameworks */,
+				55261B582C763E4300FF6F35 /* SwiftUIIntrospect in Frameworks */,
+				55261B322C75EC5E00FF6F35 /* Kroma in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +78,11 @@
 			);
 			name = "DRS Chart Editor";
 			packageProductDependencies = (
+				55261B0B2C75A04100FF6F35 /* DRSKit */,
+				55261B312C75EC5E00FF6F35 /* Kroma */,
+				55261B372C761DF900FF6F35 /* DRSKit */,
+				55261B392C761DF900FF6F35 /* DRSXMLImporter */,
+				55261B572C763E4300FF6F35 /* SwiftUIIntrospect */,
 			);
 			productName = "DRS Chart Editor";
 			productReference = 55261AE22C759C5000FF6F35 /* DRS Chart Editor.app */;
@@ -94,6 +112,11 @@
 			);
 			mainGroup = 55261AD92C759C5000FF6F35;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				55261B0A2C75A04100FF6F35 /* XCLocalSwiftPackageReference "../DRSKit" */,
+				55261B302C75EC5E00FF6F35 /* XCRemoteSwiftPackageReference "Kroma" */,
+				55261B562C763E4300FF6F35 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 55261AE32C759C5000FF6F35 /* Products */;
 			projectDirPath = "";
@@ -252,6 +275,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "DRS Chart Editor";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -272,7 +297,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 2.0;
 			};
@@ -291,6 +316,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "DRS Chart Editor";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -311,7 +338,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 2.0;
 			};
@@ -339,6 +366,57 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		55261B0A2C75A04100FF6F35 /* XCLocalSwiftPackageReference "../DRSKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../DRSKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		55261B302C75EC5E00FF6F35 /* XCRemoteSwiftPackageReference "Kroma" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kaishin/Kroma";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		55261B562C763E4300FF6F35 /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/swiftui-introspect/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		55261B0B2C75A04100FF6F35 /* DRSKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DRSKit;
+		};
+		55261B312C75EC5E00FF6F35 /* Kroma */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55261B302C75EC5E00FF6F35 /* XCRemoteSwiftPackageReference "Kroma" */;
+			productName = Kroma;
+		};
+		55261B372C761DF900FF6F35 /* DRSKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DRSKit;
+		};
+		55261B392C761DF900FF6F35 /* DRSXMLImporter */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DRSXMLImporter;
+		};
+		55261B572C763E4300FF6F35 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55261B562C763E4300FF6F35 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
+			productName = SwiftUIIntrospect;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 55261ADA2C759C5000FF6F35 /* Project object */;
 }
