@@ -12,15 +12,29 @@
 		55261B382C761DF900FF6F35 /* DRSKit in Frameworks */ = {isa = PBXBuildFile; productRef = 55261B372C761DF900FF6F35 /* DRSKit */; };
 		55261B3A2C761DF900FF6F35 /* DRSXMLImporter in Frameworks */ = {isa = PBXBuildFile; productRef = 55261B392C761DF900FF6F35 /* DRSXMLImporter */; };
 		55261B582C763E4300FF6F35 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 55261B572C763E4300FF6F35 /* SwiftUIIntrospect */; };
+		55FE5AD62C7791160037DD03 /* Sliders in Frameworks */ = {isa = PBXBuildFile; productRef = 55FE5AD52C7791160037DD03 /* Sliders */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		55261AE22C759C5000FF6F35 /* DRS Chart Editor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DRS Chart Editor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		55559AB12C77410E00CFF021 /* Exceptions for "DRS Chart Editor" folder in "DRS Chart Editor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Preview Content/seq.xml",
+			);
+			target = 55261AE12C759C5000FF6F35 /* DRS Chart Editor */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		55261AE42C759C5000FF6F35 /* DRS Chart Editor */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				55559AB12C77410E00CFF021 /* Exceptions for "DRS Chart Editor" folder in "DRS Chart Editor" target */,
+			);
 			path = "DRS Chart Editor";
 			sourceTree = "<group>";
 		};
@@ -34,6 +48,7 @@
 				55261B0C2C75A04100FF6F35 /* DRSKit in Frameworks */,
 				55261B382C761DF900FF6F35 /* DRSKit in Frameworks */,
 				55261B3A2C761DF900FF6F35 /* DRSXMLImporter in Frameworks */,
+				55FE5AD62C7791160037DD03 /* Sliders in Frameworks */,
 				55261B582C763E4300FF6F35 /* SwiftUIIntrospect in Frameworks */,
 				55261B322C75EC5E00FF6F35 /* Kroma in Frameworks */,
 			);
@@ -83,6 +98,7 @@
 				55261B372C761DF900FF6F35 /* DRSKit */,
 				55261B392C761DF900FF6F35 /* DRSXMLImporter */,
 				55261B572C763E4300FF6F35 /* SwiftUIIntrospect */,
+				55FE5AD52C7791160037DD03 /* Sliders */,
 			);
 			productName = "DRS Chart Editor";
 			productReference = 55261AE22C759C5000FF6F35 /* DRS Chart Editor.app */;
@@ -116,6 +132,7 @@
 				55261B0A2C75A04100FF6F35 /* XCLocalSwiftPackageReference "../DRSKit" */,
 				55261B302C75EC5E00FF6F35 /* XCRemoteSwiftPackageReference "Kroma" */,
 				55261B562C763E4300FF6F35 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
+				55FE5AD42C7791160037DD03 /* XCRemoteSwiftPackageReference "swiftui-sliders" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 55261AE32C759C5000FF6F35 /* Products */;
@@ -270,7 +287,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DRS Chart Editor/DRS_Chart_Editor.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"DRS Chart Editor/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "DRS\\ Chart\\ Editor/Preview\\ Content";
 				DEVELOPMENT_TEAM = 32Z9KZZ4PU;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -296,6 +313,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -311,7 +329,7 @@
 				CODE_SIGN_ENTITLEMENTS = "DRS Chart Editor/DRS_Chart_Editor.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"DRS Chart Editor/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "DRS\\ Chart\\ Editor/Preview\\ Content";
 				DEVELOPMENT_TEAM = 32Z9KZZ4PU;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -337,6 +355,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -391,6 +410,14 @@
 				minimumVersion = 1.3.0;
 			};
 		};
+		55FE5AD42C7791160037DD03 /* XCRemoteSwiftPackageReference "swiftui-sliders" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/spacenation/swiftui-sliders";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -415,6 +442,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 55261B562C763E4300FF6F35 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
 			productName = SwiftUIIntrospect;
+		};
+		55FE5AD52C7791160037DD03 /* Sliders */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55FE5AD42C7791160037DD03 /* XCRemoteSwiftPackageReference "swiftui-sliders" */;
+			productName = Sliders;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
