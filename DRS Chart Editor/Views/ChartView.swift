@@ -117,7 +117,7 @@ struct ChartView: View {
         GeometryReader { geometry in
             ZStack(alignment: .topLeading) {
                 ScrollView {
-                    LazyVStack {
+                    VStack {
                         ZStack(alignment: .topLeading) {
                             Lanes()
                                 .frame(
@@ -150,9 +150,10 @@ struct ChartView: View {
                                     PlayBarModifier(
                                         offset: $playBarOffset, isPlaying: $isPlaying, seq: seq, speed: speed, musicURL: musicURL)),
                             alignment: .topLeading)
+                        Spacer()
+                            .frame(height: geometry.size.height)
                     }
-                    Spacer()
-                        .frame(height: geometry.size.height)
+                    .rotation3DEffect(.degrees(180), axis: (x: 1, y: 0, z: 0))
                 }
                 .scrollPosition($position)
             }
