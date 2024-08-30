@@ -120,9 +120,8 @@ struct ChartView: View {
                                 height: tickToOffset(seq.info.endTick, seq: seq, speed: speed)
                             )
                             .padding([.horizontal], 32)
-                        ForEach($seq.steps, id: \.self) { step in
+                        ForEach($seq.steps, id: \.id) { step in
                             StepView(step: step, seq: seq, speed: speed)
-                                .id(step.id)
                         }
                     }
                     .overlay(
@@ -282,21 +281,6 @@ struct ChartView: View {
                 }
             }
         }
-    }
-
-    func getBPMAndMeasure(by tick: Int32) -> (Seq.Info.BPM, Seq.Info.Measure) {
-        let bpm = seq.info.bpm.enumerated().first(where: { (i, bpm) in
-            i + 1 == seq.info.bpm.count
-                || (bpm.tick <= tick && seq.info.bpm[i + 1].tick > tick)
-        })!.element
-
-        let measure = seq.info.measure.enumerated().first(where: {
-            (i, measure) in
-            i + 1 == seq.info.measure.count
-                || (measure.tick <= tick && seq.info.measure[i + 1].tick > tick)
-        })!.element
-
-        return (bpm, measure)
     }
 }
 

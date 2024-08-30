@@ -35,7 +35,7 @@ struct ContentView: View {
                             guard success.startAccessingSecurityScopedResource() else { return }
                             let seq = try Seq.importXML(success)
                             smallModel.seq = seq
-                            navPath.append(seq)
+                            navPath.append(true)
                             success.stopAccessingSecurityScopedResource()
                         } catch {
                             fileImportError = error
@@ -56,7 +56,7 @@ struct ContentView: View {
                     Text("Create new chart")
                 }
             }
-            .navigationDestination(for: Seq.self) { seq in
+            .navigationDestination(for: Bool.self) { seq in
                 ChartView(seq: $smallModel.seq)
             }
         }
