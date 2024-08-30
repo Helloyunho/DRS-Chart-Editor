@@ -21,22 +21,24 @@ struct StepperWithTextField<T: BinaryInteger & LosslessStringConvertible>: View 
     
     var body: some View {
         HStack {
-            TextField("", text: $textBinding)
-                .fixedSize()
+            TextField(String(range.upperBound), text: $textBinding)
             #if os(iOS)
                 .keyboardType(.decimalPad)
             #endif
                 .submitLabel(.done)
                 .focused($focused)
+                .fixedSize()
                 .onAppear {
                     textBinding = String(value)
                 }
                 .toolbar {
                     ToolbarItem(placement: .keyboard) {
-                        HStack {
-                            Spacer()
-                            Button("Done") {
-                                focused = false
+                        if focused {
+                            HStack {
+                                Spacer()
+                                Button("Done") {
+                                    focused = false
+                                }
                             }
                         }
                     }
@@ -45,6 +47,7 @@ struct StepperWithTextField<T: BinaryInteger & LosslessStringConvertible>: View 
                     focused = false
                 }
             Stepper("", value: $value, in: range, step: step)
+                .labelsHidden()
         }
         .onChange(of: textBinding) {
             value = T(textBinding) ?? value
@@ -53,4 +56,16 @@ struct StepperWithTextField<T: BinaryInteger & LosslessStringConvertible>: View 
             textBinding = String(value)
         }
     }
+}
+
+#Preview {
+    struct StepperWithTextField_Preview: View {
+        @State var test: Int = 1
+        
+        var body: some View {
+            StepperWithTextField(value: $test, range: 0...100, step: 1)
+        }
+    }
+    
+    return StepperWithTextField_Preview()
 }

@@ -22,7 +22,7 @@ struct JumpStep: View {
                 y: tickToOffset(step.startTick, seq: seq, speed: speed)
             )
             .sheet(isPresented: $showPopover) { // trust me i tried popover but it didnt end up well
-                Form {
+                VStack {
                     HStack {
                         Text("Tick")
                         Spacer()
@@ -35,8 +35,22 @@ struct JumpStep: View {
                                 step.endTick = tick
                             }
                     }
+                    Spacer()
+                    #if os(macOS)
+                    HStack {
+                        Spacer()
+                        Button("OK") {
+                            showPopover = false
+                        }
+                        .keyboardShortcut(.defaultAction)
+                    }
+                    .padding(.top)
+                    #endif
                 }
+                .padding()
+                #if os(iOS)
                 .presentationDetents([.medium, .large])
+                #endif
             }
             .onTapGesture {
                 showPopover = true
@@ -59,9 +73,6 @@ struct JumpStep: View {
                 }
                 .frame(height: tickToOffset(seq.info.endTick, seq: seq, speed: 1.0))
                 .frame(maxWidth: .infinity)
-            }
-            .onAppear {
-                print(step.wrappedValue.startTick)
             }
         }
     }

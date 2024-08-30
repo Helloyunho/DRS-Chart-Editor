@@ -1,5 +1,5 @@
 {
-  "originHash" : "d9aec867b7f484ae9d15193d1b2e09f072219cda5c7badb2e23aff9a7800e36f",
+  "originHash" : "ca69d241d875285eda910c803aed2b23f300950e5231d408712979008c5c0a08",
   "pins" : [
     {
       "identity" : "kroma",
@@ -17,15 +17,6 @@
       "state" : {
         "revision" : "807f73ce09a9b9723f12385e592b4e0aaebd3336",
         "version" : "1.3.0"
-      }
-    },
-    {
-      "identity" : "swiftui-sliders",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/spacenation/swiftui-sliders",
-      "state" : {
-        "revision" : "d5a7d856655d5c91f891c2b69d982c30fd5c7bdf",
-        "version" : "2.1.0"
       }
     },
     {

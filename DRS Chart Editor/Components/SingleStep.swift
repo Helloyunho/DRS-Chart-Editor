@@ -29,7 +29,8 @@ struct SingleStep: View {
     let speed: Double
     @State var showPopover = false
     @State var tick: Int32 = 0
-    @State var widthRangeBinding: ClosedRange<Int32> = 0...65536
+    @State var leftPos: Int32 = 0
+    @State var rightPos: Int32 = 0
 
     var body: some View {
         Group {
@@ -55,7 +56,7 @@ struct SingleStep: View {
             }
         }
         .sheet(isPresented: $showPopover) {
-            Form {
+            VStack(alignment: .leading) {
                 HStack {
                     Text("Tick")
                     Spacer()
@@ -69,28 +70,41 @@ struct SingleStep: View {
                         }
                 }
                 HStack {
-                    Text("Width")
-                    Spacer()
-                    RangeSliderWithTextFieldInt(value: $widthRangeBinding, range: 0...65536)
+                    Text("Left")
+                    SliderWithTextFieldInt(value: $leftPos, range: 0...65536)
                         .onAppear {
-                            widthRangeBinding = step.leftPos...step.rightPos
+                            leftPos = step.leftPos
                         }
-                        .onChange(of: widthRangeBinding) {
-                            step.leftPos = widthRangeBinding.lowerBound
-                            step.rightPos = widthRangeBinding.upperBound
+                        .onChange(of: leftPos) {
+                            step.leftPos = leftPos
                         }
                 }
-            }
-            #if os(iOS)
-            .presentationDetents([.medium, .large])
-            #endif
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
+                HStack {
+                    Text("Right")
+                    SliderWithTextFieldInt(value: $rightPos, range: 0...65536)
+                        .onAppear {
+                            rightPos = step.rightPos
+                        }
+                        .onChange(of: rightPos) {
+                            step.rightPos = rightPos
+                        }
+                }
+                Spacer()
+                #if os(macOS)
+                HStack {
+                    Spacer()
                     Button("OK") {
                         showPopover = false
                     }
+                    .keyboardShortcut(.defaultAction)
                 }
+                .padding(.top)
+                #endif
             }
+            .padding()
+            #if os(iOS)
+            .presentationDetents([.medium, .large])
+            #endif
         }
     }
 }

@@ -5,32 +5,30 @@
 //  Created by Helloyunho on 2024/8/21.
 //
 
+import AVFoundation
 import Combine
 import DRSKit
 import Kroma
 import SwiftUI
-import AVFoundation
 
-struct PlayBarModifier: @preconcurrency Animatable, ViewModifier {
+struct PlayBarModifier: ViewModifier {
     @Binding var offset: CGFloat
     @Binding var isPlaying: Bool
+    @Binding var scrollPosition: ScrollPosition
     let seq: Seq
     var speed: Double
     let musicURL: URL?
-    private var offsetValue: CGFloat
     @State private var player: AVPlayer = .init()
     @State var error: Error?
     @State var showError = false
 
-    var animatableData: CGFloat {
-        get { offsetValue }
-        set { offsetValue = newValue }
-    }
-
-    init(offset: Binding<CGFloat>, isPlaying: Binding<Bool>, seq: Seq, speed: Double, musicURL: URL?) {
+    init(
+        offset: Binding<CGFloat>, isPlaying: Binding<Bool>, scrollPosition: Binding<ScrollPosition>, seq: Seq,
+        speed: Double, musicURL: URL?
+    ) {
         _offset = offset
-        offsetValue = offset.wrappedValue
         _isPlaying = isPlaying
+        _scrollPosition = scrollPosition
         self.seq = seq
         self.speed = speed
         self.musicURL = musicURL
@@ -38,7 +36,7 @@ struct PlayBarModifier: @preconcurrency Animatable, ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .offset(y: offsetValue)
+            .offset(y: offset)
             .onChange(of: isPlaying) {
                 if isPlaying {
                     startAnimation()
@@ -57,16 +55,17 @@ struct PlayBarModifier: @preconcurrency Animatable, ViewModifier {
                     self.offset = 0
                 } else {
                     self.offset = timeToOffset(time.seconds * 1000, speed: self.speed)
+                    scrollPosition.scrollTo(y: self.offset)
                 }
             }
     }
 
     func startAnimation() {
         do {
-            let currPosToTime = offsetToTime(offsetValue, speed: speed)
+            let currPosToTime = offsetToTime(offset, speed: speed)
             #if os(iOS)
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
+                try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+                try AVAudioSession.sharedInstance().setActive(true)
             #endif
             if let musicURL, musicURL.startAccessingSecurityScopedResource() {
                 player.replaceCurrentItem(with: AVPlayerItem(url: musicURL))
@@ -93,82 +92,91 @@ struct ChartView: View {
     @State var isPlaying = false
     @State var playBarOffset: CGFloat = 0.0
     @State var musicURL: URL?
-    @State var showEndTickSetting = false
+    @State var showEndTimeSetting = false
+    @State var endTime: Double = 0.0
     @State var showSpeedSetting = false
     @State var showMusicImporter = false
     @State var error: Error?
     @State var showError: Bool = false
-    var nf: NumberFormatter {
-        let nf = NumberFormatter()
-        nf.numberStyle = .decimal
-        nf.usesGroupingSeparator = false
-        nf.allowsFloats = false
-        return nf
-    }
+    //    var nf: NumberFormatter {
+    //        let nf = NumberFormatter()
+    //        nf.numberStyle = .none
+    //        nf.allowsFloats = false
+    //        return nf
+    //    }
     var floatNf: NumberFormatter {
         let nf = NumberFormatter()
-        nf.numberStyle = .decimal
-        nf.usesGroupingSeparator = false
-        nf.allowsFloats = true
+        nf.numberStyle = .none
         return nf
     }
 
     var body: some View {
         GeometryReader { geometry in
-            ZStack(alignment: .topLeading) {
-                ScrollView {
-                    VStack {
-                        ZStack(alignment: .topLeading) {
-                            Lanes()
-                                .frame(
-                                    height: tickToOffset(seq.info.endTick, seq: seq, speed: speed)
-                                )
-                                .padding([.horizontal], 32)
-                            ForEach($seq.steps, id: \.self) { step in
-                                StepView(step: step, seq: seq, speed: speed)
-                            }
+            ScrollView {
+                LazyVStack {
+                    ZStack(alignment: .topLeading) {
+                        Lanes()
+                            .frame(
+                                height: tickToOffset(seq.info.endTick, seq: seq, speed: speed)
+                            )
+                            .padding([.horizontal], 32)
+                        ForEach($seq.steps, id: \.self) { step in
+                            StepView(step: step, seq: seq, speed: speed)
+                                .id(step.id)
                         }
-                        .overlay(
-                            Rectangle()
-                                .fill(Color.blue.darker(by: 0.2))
-                                .frame(width: 32)
-                                .onTapGesture { location in
-                                    playBarOffset = location.y
-                                }, alignment: .trailing
-                        )
-
-                        .overlay(
-                            HorizontalLine()
-                                .stroke(
-                                    .green,
-                                    style: StrokeStyle(
-                                        lineWidth: 4, lineCap: .round, lineJoin: .round)
-                                )
-                                .frame(height: 4)
-                                .offset(y: 2)
-                                .modifier(
-                                    PlayBarModifier(
-                                        offset: $playBarOffset, isPlaying: $isPlaying, seq: seq, speed: speed, musicURL: musicURL)),
-                            alignment: .topLeading)
-                        Spacer()
-                            .frame(height: geometry.size.height)
                     }
-                    .rotation3DEffect(.degrees(180), axis: (x: 1, y: 0, z: 0))
+                    .overlay(
+                        Rectangle()
+                            .fill(Color.blue.darker(by: 0.2))
+                            .frame(width: 32)
+                            .onTapGesture { location in
+                                playBarOffset = location.y
+                            }, alignment: .trailing
+                    )
+
+                    .overlay(
+                        HorizontalLine()
+                            .stroke(
+                                .green,
+                                style: StrokeStyle(
+                                    lineWidth: 4, lineCap: .round, lineJoin: .round)
+                            )
+                            .id("playBar")
+                            .frame(height: 4)
+                            .offset(y: 2)
+                            .modifier(
+                                PlayBarModifier(
+                                    offset: $playBarOffset, isPlaying: $isPlaying, scrollPosition: $position, seq: seq,
+                                    speed: speed,
+                                    musicURL: musicURL)),
+                        alignment: .topLeading)
+                    Spacer()
+                        .frame(height: geometry.size.height)
                 }
-                .scrollPosition($position)
             }
+            .scrollPosition($position)
         }
         .padding()
-        .alert("End Tick", isPresented: $showEndTickSetting) {
-            TextField("End Tick", value: $seq.info.endTick, formatter: nf)
+        .alert("End Time", isPresented: $showEndTimeSetting) {
+            TextField(String(endTime), value: $endTime, formatter: floatNf)
+                #if os(iOS)
+                    .keyboardType(.decimalPad)
+                #endif
+                .onAppear {
+                    endTime = tickToTime(seq.info.endTick, seq: seq)
+                }
             Button("OK") {
-                showEndTickSetting = false
+                seq.info.endTick = timeToTick(endTime, seq: seq)
+                showEndTimeSetting = false
             }
         } message: {
-            Text("Set the end tick")
+            Text("Set the end time (in ms)")
         }
         .alert("Speed", isPresented: $showSpeedSetting) {
-            TextField("Speed", value: $speed, formatter: nf)
+            TextField(String(speed), value: $speed, formatter: floatNf)
+                #if os(iOS)
+                    .keyboardType(.decimalPad)
+                #endif
             Button("OK") {
                 showSpeedSetting = false
             }
@@ -200,9 +208,9 @@ struct ChartView: View {
                         Label("Speed", systemImage: "hare")
                     }
                     Button {
-                        showEndTickSetting = true
+                        showEndTimeSetting = true
                     } label: {
-                        Label("End Tick", systemImage: "forward.end")
+                        Label("End Time", systemImage: "forward.end")
                     }
                     Button {
                         showMusicImporter = true
