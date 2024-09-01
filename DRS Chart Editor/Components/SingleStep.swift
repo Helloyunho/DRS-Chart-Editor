@@ -28,6 +28,7 @@ struct SingleStep: View {
     let seq: Seq
     let speed: Double
     @State var showPopover = false
+    @State var kind: Seq.Step.Kind = .left
     @State var tick: Int32 = 0
     @State var leftPos: Int32 = 0
     @State var rightPos: Int32 = 0
@@ -60,7 +61,11 @@ struct SingleStep: View {
                 HStack {
                     Text("Tick")
                     Spacer()
-                    StepperWithTextField(value: $tick, range: 0...seq.info.endTick)
+                    CustomStepperWithTextField(value: $tick, maxValue: seq.info.endTick) {
+                        tick = numTickWithMeasures(tick, seq: seq, direction: .next)
+                    } onDecrement: {
+                        tick = numTickWithMeasures(tick, seq: seq, direction: .previous)
+                    }
                         .onAppear {
                             tick = step.startTick
                         }
@@ -70,8 +75,25 @@ struct SingleStep: View {
                         }
                 }
                 HStack {
-                    Text("Left")
-                    SliderWithTextFieldInt(value: $leftPos, range: 0...65536)
+                    Text("Style")
+                    Spacer()
+                    Picker("Style", selection: $kind) {
+                        Text("Left").tag(Seq.Step.Kind.left)
+                        Text("Right").tag(Seq.Step.Kind.right)
+                    }
+                    .pickerStyle(.segmented)
+                    .fixedSize()
+                    .labelsHidden()
+                    .onAppear {
+                        kind = step.kind
+                    }
+                    .onChange(of: kind) {
+                        step.kind = kind
+                    }
+                }
+                HStack {
+                    Text("Left Pos")
+                    SliderWithTextFieldInt(value: $leftPos, range: 0...rightPos)
                         .onAppear {
                             leftPos = step.leftPos
                         }
@@ -80,8 +102,8 @@ struct SingleStep: View {
                         }
                 }
                 HStack {
-                    Text("Right")
-                    SliderWithTextFieldInt(value: $rightPos, range: 0...65536)
+                    Text("Right Pos")
+                    SliderWithTextFieldInt(value: $rightPos, range: leftPos...65536)
                         .onAppear {
                             rightPos = step.rightPos
                         }

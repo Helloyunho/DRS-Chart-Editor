@@ -19,14 +19,18 @@ struct DownStep: View {
             .fill(.yellow)
             .frame(width: 16, height: 16)
             .offset(
-                y: tickToOffset(step.startTick, seq: seq, speed: speed)
+                y: tickToOffset(step.startTick, seq: seq, speed: speed) - 8
             )
             .sheet(isPresented: $showPopover) {
                 VStack {
                     HStack {
                         Text("Tick")
                         Spacer()
-                        StepperWithTextField(value: $tick, range: 0...seq.info.endTick)
+                        CustomStepperWithTextField(value: $tick, maxValue: seq.info.endTick) {
+                            tick = numTickWithMeasures(tick, seq: seq, direction: .next)
+                        } onDecrement: {
+                            tick = numTickWithMeasures(tick, seq: seq, direction: .previous)
+                        }
                             .onAppear {
                                 tick = step.startTick
                             }

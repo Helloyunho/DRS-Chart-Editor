@@ -91,13 +91,20 @@ struct ChartView: View {
     @State private var position = ScrollPosition(edge: .top)
     @State var isPlaying = false
     @State var playBarOffset: CGFloat = 0.0
+    @State var playBarTick: Int32 = 0
     @State var musicURL: URL?
     @State var showEndTimeSetting = false
     @State var endTime: Double = 0.0
     @State var showSpeedSetting = false
     @State var showMusicImporter = false
+    @State var showChartExporter = false
+    @State var showPlayBarTickSetting: Bool = false
     @State var error: Error?
     @State var showError: Bool = false
+    @State var removeStepIndex: Int?
+    @State var showRemoveStep: Bool = false
+    @State var numTicks = [Int32]()
+    @State var beatTicks = [Int32]()
     //    var nf: NumberFormatter {
     //        let nf = NumberFormatter()
     //        nf.numberStyle = .none
@@ -120,8 +127,33 @@ struct ChartView: View {
                                 height: tickToOffset(seq.info.endTick, seq: seq, speed: speed)
                             )
                             .padding([.horizontal], 32)
-                        ForEach($seq.steps, id: \.id) { step in
+                        ForEach(numTicks, id: \.self) { tick in
+                            HorizontalLine()
+                                .stroke(
+                                    style: StrokeStyle(
+                                        lineWidth: 2, lineCap: .round, lineJoin: .round)
+                                )
+                                .frame(height: 2)
+                                .offset(y: tickToOffset(tick, seq: seq, speed: speed))
+                        }
+                        ForEach(beatTicks, id: \.self) { tick in
+                            HorizontalLine()
+                                .stroke(
+                                    style: StrokeStyle(
+                                        lineWidth: 4, lineCap: .round, lineJoin: .round)
+                                )
+                                .frame(height: 4)
+                                .offset(y: tickToOffset(tick, seq: seq, speed: speed))
+                        }
+                        ForEach(Array(zip(seq.steps.indices, $seq.steps)), id: \.1.id) { index, step in
                             StepView(step: step, seq: seq, speed: speed)
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        seq.steps.remove(at: index)
+                                    } label: {
+                                        Label("Delete", systemImage: "delete.left")
+                                    }
+                                }
                         }
                     }
                     .overlay(
@@ -143,6 +175,12 @@ struct ChartView: View {
                             .id("playBar")
                             .frame(height: 4)
                             .offset(y: 2)
+                            .overlay(
+                                Text(verbatim: "\(getCurrentTick())")
+                                    .onTapGesture {
+                                        showPlayBarTickSetting = true
+                                    }
+                            )
                             .modifier(
                                 PlayBarModifier(
                                     offset: $playBarOffset, isPlaying: $isPlaying, scrollPosition: $position, seq: seq,
@@ -182,6 +220,24 @@ struct ChartView: View {
         } message: {
             Text("Set the lane speed")
         }
+        .alert("Play Bar Tick", isPresented: $showPlayBarTickSetting) {
+            CustomStepperWithTextField(value: $playBarTick, maxValue: seq.info.endTick) {
+                playBarTick = numTickWithMeasures(playBarTick, seq: seq, direction: .next)
+            } onDecrement: {
+                playBarTick = numTickWithMeasures(playBarTick, seq: seq, direction: .previous)
+            }
+            .onAppear {
+                playBarTick = getCurrentTick()
+            }
+            .onChange(of: playBarTick) {
+                playBarOffset = tickToOffset(playBarTick, seq: seq, speed: speed)
+            }
+            Button("OK") {
+                showPlayBarTickSetting = false
+            }
+        } message: {
+            Text("Set the current play bar tick")
+        }
         .alert("Error", isPresented: $showError) {
             Button("OK") {
                 showError = false
@@ -198,8 +254,22 @@ struct ChartView: View {
                 showError = true
             }
         }
+        .fileExporter(isPresented: $showChartExporter, document: seq, contentType: .xml) { result in
+            switch result {
+            case .success(_):
+                break
+            case .failure(let failure):
+                error = failure
+                showError = true
+            }
+        }
         .toolbar {
             ToolbarItemGroup {
+                Button {
+                    showChartExporter = true
+                } label: {
+                    Label("Save", systemImage: "square.and.arrow.up")
+                }
                 Menu {
                     Button {
                         showSpeedSetting = true
@@ -240,23 +310,44 @@ struct ChartView: View {
                 .disabled(position.edge == .bottom)
                 Menu {
                     Button {
-
+                        let tick = getCurrentTick()
+                        seq.steps.append(
+                            .init(
+                                startTick: tick, endTick: tick, leftPos: 0, rightPos: 65536,
+                                longPoints: [], kind: .left, playerID: .Player1))
                     } label: {
-                        Label("Note", systemImage: "minus")
+                        Label("Step", systemImage: "minus")
                     }
                     Button {
-
+                        let tick = getCurrentTick()
+                        seq.steps.append(
+                            .init(
+                                startTick: tick,
+                                endTick: numTickWithMeasures(tick, seq: seq, direction: .next), leftPos: 0,
+                                rightPos: 65536,
+                                longPoints: [
+                                    .init(
+                                        tick: numTickWithMeasures(tick, seq: seq, direction: .next), leftPos: 0,
+                                        rightPos: 65536)
+                                ], kind: .left, playerID: .Player1))
                     } label: {
                         Label(
-                            "Long Note", systemImage: "rectangle.portrait.fill")
+                            "Long Step", systemImage: "rectangle.portrait.fill")
                     }
                     Button {
-
+                        let tick = getCurrentTick()
+                        seq.steps.append(
+                            .init(
+                                startTick: tick, endTick: tick, leftPos: 0, rightPos: 65536,
+                                longPoints: [], kind: .down, playerID: .dummy3))
                     } label: {
                         Label("Down", systemImage: "arrowshape.down")
                     }
                     Button {
-
+                        seq.steps.append(
+                            .init(
+                                startTick: getCurrentTick(), endTick: getCurrentTick(), leftPos: 0, rightPos: 65536,
+                                longPoints: [], kind: .jump, playerID: .dummy3))
                     } label: {
                         Label("Jump", systemImage: "chevron.up.2")
                     }
@@ -281,6 +372,24 @@ struct ChartView: View {
                 }
             }
         }
+        .onAppear {
+            updateBackgroundTicks()
+        }
+        .onChange(of: seq.info.bpm) {
+            updateBackgroundTicks()
+        }
+        .onChange(of: seq.info.measure) {
+            updateBackgroundTicks()
+        }
+    }
+
+    func updateBackgroundTicks() {
+        numTicks = allNumeratorTicks(seq: seq)
+        beatTicks = allBeatTicks(seq: seq)
+    }
+
+    func getCurrentTick() -> Int32 {
+        offsetToTick(playBarOffset, seq: seq, speed: speed)
     }
 }
 

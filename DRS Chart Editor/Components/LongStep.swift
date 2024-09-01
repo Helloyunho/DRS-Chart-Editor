@@ -42,6 +42,273 @@ struct LongStepShape: Shape {
     }
 }
 
+struct LongStepInnerView: View {
+    @Binding var step: Seq.Step
+    let seq: Seq
+    let index: Int
+
+    @State var tick: Int32 = 0
+    @State var leftPos: Int32 = 0
+    @State var rightPos: Int32 = 0
+    @State var enableEndPos: Bool = false
+    @State var leftEndPos: Int32 = 0
+    @State var rightEndPos: Int32 = 0
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text("Tick")
+                Spacer()
+                CustomStepperWithTextField(
+                    value: $tick,
+                    maxValue: (index != (step.longPoints.count - 1) ? step.longPoints[index + 1].tick : step.endTick)
+                ) {
+                    let tempTick = numTickWithMeasures(tick, seq: seq, direction: .next)
+                    if tempTick <= (index != (step.longPoints.count - 1) ? step.longPoints[index + 1].tick : step.endTick) {
+                        tick = tempTick
+                    }
+                } onDecrement: {
+                    let tempTick = numTickWithMeasures(tick, seq: seq, direction: .previous)
+                    if tempTick >= (index != 0 ? step.longPoints[index - 1].tick : step.startTick) {
+                        tick = tempTick
+                    }
+                }
+                .onAppear {
+                    tick = step.longPoints[index].tick
+                }
+                .onChange(of: tick) {
+                    step.longPoints[index].tick = tick
+                }
+            }
+            HStack {
+                Text("Left Pos")
+                Spacer()
+                SliderWithTextFieldInt(value: $leftPos, range: 0...rightPos)
+                    .onAppear {
+                        leftPos = step.longPoints[index].leftPos
+                    }
+                    .onChange(of: leftPos) {
+                        step.longPoints[index].leftPos = leftPos
+                    }
+            }
+            HStack {
+                Text("Right Pos")
+                Spacer()
+                SliderWithTextFieldInt(value: $rightPos, range: leftPos...65536)
+                    .onAppear {
+                        rightPos = step.longPoints[index].rightPos
+                    }
+                    .onChange(of: rightPos) {
+                        step.longPoints[index].rightPos = rightPos
+                    }
+            }
+            HStack {
+                Text("Custom End Pos")
+                Spacer()
+                Toggle(isOn: $enableEndPos) {}
+                    .onAppear {
+                        enableEndPos =
+                            step.longPoints[index].leftEndPos != nil && step.longPoints[index].rightEndPos != nil
+                    }
+                    .onChange(of: enableEndPos) {
+                        if enableEndPos {
+                            if step.longPoints[index].leftEndPos == nil {
+                                step.longPoints[index].leftEndPos = 0
+                            }
+                            if step.longPoints[index].rightEndPos == nil {
+                                step.longPoints[index].rightEndPos = 0
+                            }
+                        } else {
+                            step.longPoints[index].leftEndPos = nil
+                            step.longPoints[index].rightEndPos = nil
+                        }
+                    }
+            }
+            if enableEndPos {
+                HStack {
+                    Text("Left End Pos")
+                    Spacer()
+                    SliderWithTextFieldInt(value: $leftEndPos, range: 0...rightEndPos)
+                        .onAppear {
+                            leftEndPos = step.longPoints[index].leftEndPos ?? 0
+                        }
+                        .onChange(of: leftEndPos) {
+                            step.longPoints[index].leftEndPos = leftEndPos
+                        }
+                }
+                HStack {
+                    Text("Right End Pos")
+                    Spacer()
+                    SliderWithTextFieldInt(value: $rightEndPos, range: leftEndPos...65536)
+                        .onAppear {
+                            rightEndPos = step.longPoints[index].rightEndPos ?? 0
+                        }
+                        .onChange(of: rightEndPos) {
+                            step.longPoints[index].rightEndPos = rightEndPos
+                        }
+                }
+            }
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+struct LongStepSheetView: View {
+    @Environment(\.defaultMinListRowHeight) var minRowHeight
+    @Binding var showPopover: Bool
+    @Binding var step: Seq.Step
+    let seq: Seq
+    @State var startTick: Int32 = 0
+    @State var endTick: Int32 = 0
+    @State var kind: Seq.Step.Kind = .left
+    @State var leftPos: Int32 = 0
+    @State var rightPos: Int32 = 0
+    @State var longPoints = [Seq.Step.LongPoint]()
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading) {
+                HStack {
+                    Text("Start Tick")
+                    Spacer()
+                    CustomStepperWithTextField(value: $startTick, maxValue: seq.info.endTick) {
+                        startTick = numTickWithMeasures(startTick, seq: seq, direction: .next)
+                    } onDecrement: {
+                        startTick = numTickWithMeasures(startTick, seq: seq, direction: .previous)
+                    }
+                    .onAppear {
+                        startTick = step.startTick
+                    }
+                    .onChange(of: startTick) {
+                        step.startTick = startTick
+                    }
+                }
+                HStack {
+                    Text("End Tick")
+                    Spacer()
+                    CustomStepperWithTextField(value: $endTick, maxValue: seq.info.endTick) {
+                        endTick = numTickWithMeasures(endTick, seq: seq, direction: .next)
+                    } onDecrement: {
+                        endTick = numTickWithMeasures(endTick, seq: seq, direction: .previous)
+                    }
+                    .onAppear {
+                        endTick = step.endTick
+                    }
+                    .onChange(of: endTick) {
+                        step.endTick = endTick
+                    }
+                }
+                HStack {
+                    Text("Style")
+                    Spacer()
+                    Picker("Style", selection: $kind) {
+                        Text("Left").tag(Seq.Step.Kind.left)
+                        Text("Right").tag(Seq.Step.Kind.right)
+                    }
+                    .pickerStyle(.segmented)
+                    .fixedSize()
+                    .labelsHidden()
+                    .onAppear {
+                        kind = step.kind
+                    }
+                    .onChange(of: kind) {
+                        step.kind = kind
+                    }
+                }
+                HStack {
+                    Text("Left Pos")
+                    SliderWithTextFieldInt(value: $leftPos, range: 0...rightPos)
+                        .onAppear {
+                            leftPos = step.leftPos
+                        }
+                        .onChange(of: leftPos) {
+                            step.leftPos = leftPos
+                        }
+                }
+                HStack {
+                    Text("Right Pos")
+                    SliderWithTextFieldInt(value: $rightPos, range: leftPos...65536)
+                        .onAppear {
+                            rightPos = step.rightPos
+                        }
+                        .onChange(of: rightPos) {
+                            step.rightPos = rightPos
+                        }
+                }
+                Text("Long Steps")
+                    .font(.subheadline)
+                    .padding(.top)
+                List {
+                    ForEach(Array(zip(longPoints.indices, longPoints)), id: \.0) { index, lp in
+                        NavigationLink {
+                            LongStepInnerView(step: $step, seq: seq, index: index)
+                                .frame(height: 300)
+                        } label: {
+                            Text(String(lp.tick))
+                                .listRowInsets(EdgeInsets())
+                                .contextMenu {
+                                    Button {
+                                        if longPoints.count != 1 {
+                                            longPoints.remove(at: index)
+                                        }
+                                    } label: {
+                                        Text("Delete")
+                                    }
+                                    .disabled(longPoints.count == 1)
+                                }
+                        }
+                    }
+                    .onDelete { offset in
+                        if longPoints.count != 1 {
+                            step.longPoints.remove(atOffsets: offset)
+                        }
+                    }
+                    #if os(iOS)
+                        Button {
+                            addNewPoint()
+                        } label: {
+                            Text("Add")
+                        }
+                    #endif
+                }
+                .onAppear {
+                    longPoints = step.longPoints
+                }
+                .onChange(of: longPoints) {
+                    step.longPoints = longPoints
+                }
+                .frame(height: minRowHeight * 3)
+                .scrollContentBackground(.hidden)
+                .listStyle(.plain)
+                .border(.separator, width: 1)
+                .contextMenu {
+                    Button {
+                        addNewPoint()
+                    } label: {
+                        Text("Add")
+                    }
+                }
+                Spacer()
+                #if os(macOS)
+                    HStack {
+                        Spacer()
+                        Button("OK") {
+                            showPopover = false
+                        }
+                        .keyboardShortcut(.defaultAction)
+                    }
+                    .padding(.top)
+                #endif
+            }
+            .padding()
+        }
+    }
+
+    func addNewPoint() {
+        longPoints.append(Seq.Step.LongPoint(tick: step.endTick, leftPos: 0, rightPos: 65536))
+    }
+}
+
 struct LongStep: View {
     @Binding var step: Seq.Step
     let seq: Seq
@@ -116,21 +383,38 @@ struct LongStep: View {
             )
             .padding([.horizontal], 32)
         }
+        .onTapGesture {
+            showPopover = true
+        }
+        .sheet(isPresented: $showPopover) {
+            LongStepSheetView(showPopover: $showPopover, step: $step, seq: seq)
+                #if os(iOS)
+                    .presentationDetents([.medium, .large])
+                #endif
+        }
     }
 }
 
 #Preview {
-    LongStepShape(
-        step: DRSKit.Seq.Step(
-            startTick: 24960, endTick: 25440, leftPos: 45056, rightPos: 65536,
-            longPoints: [
-                DRSKit.Seq.Step.LongPoint(
-                    tick: 25200, leftPos: 45056, rightPos: 65536, leftEndPos: Optional(32768),
-                    rightEndPos: Optional(53248)),
-                DRSKit.Seq.Step.LongPoint(
-                    tick: 25440, leftPos: 32768, rightPos: 53248, leftEndPos: Optional(20480),
-                    rightEndPos: Optional(40960)),
-            ], kind: DRSKit.Seq.Step.Kind.right, playerID: DRSKit.Seq.Step.PlayerID.Player1)
-    )
-    .stroke(style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+    struct LongStepPreview: View {
+        var seq = testSeq!
+        var step = Binding<Seq.Step>(
+            get: { testSeq!.steps.first(where: { $0.kind == .left && !$0.longPoints.isEmpty })! },
+            set: {
+                testSeq!.steps[testSeq!.steps.firstIndex(where: { $0.kind == .left && !$0.longPoints.isEmpty })!] = $0
+            }
+        )
+
+        var body: some View {
+            ScrollView {
+                VStack {
+                    LongStep(step: step, seq: seq, speed: 1.0)
+                }
+                .frame(height: tickToOffset(seq.info.endTick, seq: seq, speed: 1.0))
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    return LongStepPreview()
 }
